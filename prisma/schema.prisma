@@ -1,0 +1,131 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "cockroachdb"
+    url      = env("DATABASE_URL")
+}
+
+model Admin {
+    id          String       @id @default(cuid())
+    email       String       @unique
+    password    String
+    name        String
+    departments Department[]
+    placements  Placement[]
+    createdAt   DateTime     @default(now())
+    updatedAt   DateTime     @updatedAt
+
+    @@map(name: "admins")
+}
+
+model Placement {
+    id        String   @id @default(cuid())
+    name      String
+    endDate   DateTime
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    Admin     Admin?   @relation(fields: [adminId], references: [id])
+    adminId   String?
+    Student   Student? @relation(fields: [studentId], references: [id])
+    studentId String?
+}
+
+model Department {
+    id        String    @id @default(cuid())
+    name      String    @unique
+    Admin     Admin?    @relation(fields: [adminId], references: [id])
+    adminId   String?
+    teachers  Teacher[]
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+
+    @@map(name: "departments")
+}
+
+model Teacher {
+    id           String      @id @default(cuid())
+    name         String
+    email        String      @unique
+    isVerified   Boolean     @default(false)
+    password     String
+    Department   Department? @relation(fields: [departmentId], references: [id])
+    subjects     Subject[]
+    departmentId String?
+    createdAt    DateTime    @default(now())
+    updatedAt    DateTime    @updatedAt
+
+    @@map(name: "teachers")
+}
+
+model Subject {
+    id          String       @id @default(cuid())
+    name        String
+    code        String       @unique
+    Teacher     Teacher?     @relation(fields: [teacherId], references: [id])
+    teacherId   String?
+    notes       Note[]
+    assignments Assignment[]
+    classes     Class[]
+    createdAt   DateTime     @default(now())
+    updatedAt   DateTime     @updatedAt
+
+    @@map(name: "subjects")
+}
+
+model Note {
+    id        String   @id @default(cuid())
+    title     String
+    content   String?
+    link      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    Subject   Subject? @relation(fields: [subjectId], references: [id])
+    subjectId String?
+
+    @@map(name: "notes")
+}
+
+model Assignment {
+    id             String   @id @default(cuid())
+    title          String
+    content        String?
+    link           String
+    submissionDate DateTime
+    Subject        Subject? @relation(fields: [subjectId], references: [id])
+    subjectId      String?
+    Student        Student? @relation(fields: [studentId], references: [id])
+    studentId      String?
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+
+    @@map(name: "assignments")
+}
+
+model Class {
+    id        String    @id @default(cuid())
+    startTime DateTime
+    endTime   DateTime
+    Subject   Subject?  @relation(fields: [subjectId], references: [id])
+    subjectId String?
+    students  Student[]
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+
+    @@map(name: "classes")
+}
+
+model Student {
+    id                String       @id @default(cuid())
+    name              String
+    email             String       @unique
+    password          String
+    assignments       Assignment[]
+    classes           Class[]
+    appliedPlacements Placement[]
+    createdAt         DateTime     @default(now())
+    updatedAt         DateTime     @updatedAt
+
+    @@map(name: "students")
+}
