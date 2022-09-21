@@ -51,8 +51,8 @@ export default function LoginComponent() {
             <p className="mt-2 text-center text-sm text-gray-600">
               Or{' '}
               <a
-                href="#"
-                className="font-medium text-indigo-600 hover:text-indigo-500"
+                onClick={() => router.push('/signup/student')}
+                className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
               >
                 start your 14-day free trial
               </a>
