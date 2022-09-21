@@ -18,8 +18,8 @@ const Student = () => {
     motherName: '',
     enrollmentNumber: '',
     phoneNumber: '',
-    course: '',
-    year: '',
+    course: 'BTECH',
+    year: '1',
   });
   const mutate = trpc.useMutation(['auth.registerstudent']);
   async function handleMutate(e: React.SyntheticEvent) {
@@ -28,6 +28,7 @@ const Student = () => {
       toast.error('Invalid Password or Email');
       return;
     } else {
+      console.log(data);
       if (
         !data.phoneNumber ||
         !data.enrollmentNumber ||

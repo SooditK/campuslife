@@ -4,8 +4,11 @@ import { BsCheck } from 'react-icons/bs';
 import { BiChevronDown } from 'react-icons/bi';
 import { Menu, Transition } from '@headlessui/react';
 import { MdAlternateEmail } from 'react-icons/md';
-import { RiPhoneLine } from 'react-icons/ri';
+import { RiPhoneLine, RiParentLine } from 'react-icons/ri';
 import { BiTrashAlt } from 'react-icons/bi';
+import { AiOutlineNumber } from 'react-icons/ai';
+import { FaChalkboardTeacher } from 'react-icons/fa';
+import { BsCalendar3 } from 'react-icons/bs';
 import { trpc } from '../../utils/trpc';
 import toast from 'react-hot-toast';
 
@@ -19,6 +22,11 @@ interface IDetailsProps {
   phone: string;
   id: string;
   createdAt: Date;
+  fatherName?: string;
+  year?: string;
+  course?: string;
+  enrollmentNumber?: string;
+  motherName?: string;
 }
 
 export default function Details({
@@ -27,9 +35,16 @@ export default function Details({
   name,
   phone,
   createdAt,
+  fatherName,
+  year,
+  course,
+  motherName,
+  enrollmentNumber,
 }: IDetailsProps) {
   const deleteTeacherMutation = trpc.useMutation(['admin.delete-teacher']);
   const verifyTeacherMutation = trpc.useMutation(['admin.verify-teacher']);
+  const deleteStudentMutation = trpc.useMutation(['admin.delete-student']);
+  const verifyStudentMutation = trpc.useMutation(['admin.verify-student']);
   const utils = trpc.useContext();
 
   async function handleDelete(e: React.SyntheticEvent, id: string) {
@@ -70,6 +85,44 @@ export default function Details({
     );
   }
 
+  async function handleDeleteStudent(e: React.SyntheticEvent, id: string) {
+    e.preventDefault();
+    toast.loading('Deleting...');
+    deleteStudentMutation.mutate(
+      { id },
+      {
+        onSuccess: () => {
+          toast.dismiss();
+          toast.success('Student deleted successfully');
+          utils.invalidateQueries('admin.getnon-verified-students');
+        },
+        onError: (error) => {
+          toast.dismiss();
+          toast.error(error.message);
+        },
+      }
+    );
+  }
+
+  async function handleVerifyStudent(e: React.SyntheticEvent, id: string) {
+    e.preventDefault();
+    toast.loading('Verifying...');
+    verifyStudentMutation.mutate(
+      { id },
+      {
+        onSuccess: () => {
+          toast.dismiss();
+          toast.success('Student verified successfully');
+          utils.invalidateQueries('admin.getnon-verified-students');
+        },
+        onError: (error) => {
+          toast.dismiss();
+          toast.error(error.message);
+        },
+      }
+    );
+  }
+
   return (
     <div className="lg:flex lg:items-center lg:justify-between">
       <div className="min-w-0 flex-1">
@@ -91,20 +144,73 @@ export default function Details({
             />
             {phone}
           </div>
-          <div className="mt-2 flex items-center text-sm text-gray-500">
-            <MdOutlineAccountCircle
-              className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-              aria-hidden="true"
-            />
-            {String(createdAt).slice(0, 25)}
-          </div>
+          {!fatherName && (
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <MdOutlineAccountCircle
+                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              {String(createdAt).slice(0, 25)}
+            </div>
+          )}
+          {fatherName && (
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <RiParentLine
+                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              {fatherName}
+            </div>
+          )}
+          {motherName && (
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <RiParentLine
+                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              {motherName}
+            </div>
+          )}
+          {enrollmentNumber && (
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <AiOutlineNumber
+                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              {enrollmentNumber}
+            </div>
+          )}
+          {course && (
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <FaChalkboardTeacher
+                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              {course}
+            </div>
+          )}
+          {year && (
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <BsCalendar3
+                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              {year}
+            </div>
+          )}
         </div>
       </div>
       <div className="mt-5 flex lg:mt-0 lg:ml-4">
         <span className="ml-3 hidden sm:block">
           <button
             type="button"
-            onClick={(e) => handleDelete(e, id)}
+            onClick={(e) => {
+              if (!enrollmentNumber) {
+                handleDelete(e, id);
+              } else {
+                handleDeleteStudent(e, id);
+              }
+            }}
             className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           >
             <BiTrashAlt
@@ -118,7 +224,13 @@ export default function Details({
         <span className="sm:ml-3">
           <button
             type="button"
-            onClick={(e) => handleVerify(e, id)}
+            onClick={(e) => {
+              if (!enrollmentNumber) {
+                handleVerify(e, id);
+              } else {
+                handleVerifyStudent(e, id);
+              }
+            }}
             className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           >
             <BsCheck className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
@@ -150,7 +262,13 @@ export default function Details({
                 {({ active }) => (
                   <a
                     href="#"
-                    onClick={(e) => handleDelete(e, id)}
+                    onClick={(e) => {
+                      if (!enrollmentNumber) {
+                        handleVerify(e, id);
+                      } else {
+                        handleVerifyStudent(e, id);
+                      }
+                    }}
                     className={classNames(
                       active ? 'bg-gray-100' : '',
                       'block px-4 py-2 text-sm text-gray-700'

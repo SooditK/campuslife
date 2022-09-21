@@ -21,15 +21,17 @@ model Admin {
 }
 
 model Placement {
-    id        String   @id @default(cuid())
-    name      String
-    endDate   DateTime
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    Admin     Admin?   @relation(fields: [adminId], references: [id])
-    adminId   String?
-    Student   Student? @relation(fields: [studentId], references: [id])
-    studentId String?
+    id          String   @id @default(cuid())
+    title       String
+    description String
+    company     String
+    endDate     DateTime
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    Admin       Admin?   @relation(fields: [adminId], references: [id])
+    adminId     String?
+    Student     Student? @relation(fields: [studentId], references: [id])
+    studentId   String?
 }
 
 model Department {
@@ -51,6 +53,7 @@ model Teacher {
     isVerified   Boolean     @default(false)
     password     String
     phone        String
+    link         String?
     Department   Department? @relation(fields: [departmentId], references: [id])
     subjects     Subject[]
     departmentId String?
