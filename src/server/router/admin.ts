@@ -6,7 +6,7 @@ export const adminRouter = createRouter()
     async resolve({ ctx }) {
       const isAdmin = await ctx.prisma.admin.findUnique({
         where: {
-          email: ctx.session.user.email,
+          email: String(ctx!.session!.user!.email),
         },
       });
       if (!isAdmin) {
@@ -35,7 +35,7 @@ export const adminRouter = createRouter()
     async resolve({ ctx, input }) {
       const isAdmin = await ctx.prisma.admin.findUnique({
         where: {
-          email: ctx.session.user.email,
+          email: String(ctx!.session!.user!.email),
         },
       });
       if (!isAdmin) {
@@ -66,7 +66,7 @@ export const adminRouter = createRouter()
     async resolve({ ctx, input }) {
       const isAdmin = await ctx.prisma.admin.findUnique({
         where: {
-          email: ctx.session.user.email,
+          email: String(ctx!.session!.user!.email),
         },
       });
       if (!isAdmin) {
