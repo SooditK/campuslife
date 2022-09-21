@@ -2,11 +2,19 @@ import React from 'react';
 import { GetServerSideProps } from 'next';
 import { unstable_getServerSession } from 'next-auth/next';
 import { authOptions } from './api/auth/[...nextauth]';
+import { signOut } from 'next-auth/react';
 
 const Protected = () => {
   return (
     <div>
       <h1>Protected</h1>
+      <button
+        onClick={() => {
+          signOut();
+        }}
+      >
+        Click me Senpai
+      </button>
     </div>
   );
 };

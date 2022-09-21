@@ -42,8 +42,13 @@ export const authOptions: NextAuthOptions = {
             if (!match) {
               throw new Error('Incorrect Email or password');
             } else {
-              finaluser = student;
-              role = 'student';
+              // check if student is verified
+              if (!student.isVerified) {
+                throw new Error('Please verify your account');
+              } else {
+                finaluser = student;
+                role = 'student';
+              }
             }
           } else {
             // match password
@@ -51,8 +56,13 @@ export const authOptions: NextAuthOptions = {
             if (!match) {
               throw new Error('Incorrect Email or password');
             } else {
-              finaluser = teacher;
-              role = 'teacher';
+              // check if teacher is verified
+              if (!teacher.isVerified) {
+                throw new Error('Please verify your account');
+              } else {
+                finaluser = teacher;
+                role = 'teacher';
+              }
             }
           }
         } else {

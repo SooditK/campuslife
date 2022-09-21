@@ -1,11 +1,10 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import Navbar from '../components/globals/Navbar';
-import { trpc } from '../utils/trpc';
+import { GetServerSideProps } from 'next';
+import { unstable_getServerSession } from 'next-auth/next';
+import { authOptions } from './api/auth/[...nextauth]';
 
 const Home: NextPage = () => {
-  const hello = trpc.useQuery(['example.hello', { text: 'from tRPC' }]);
-
   return (
     <>
       <Head>
@@ -14,11 +13,9 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar />
-
       <main className="container mx-auto flex flex-col items-center justify-center min-h-screen p-4">
         <div className="pt-6 text-2xl text-blue-500 flex justify-center items-center w-full">
-          {hello.data ? <p>{hello.data.greeting}</p> : <p>Loading..</p>}
+          <h1 className="text-4xl font-bold">Welcome to CampusLife!</h1>
         </div>
       </main>
     </>
@@ -26,3 +23,47 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+// getserversideprops
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  // if the user is already logged in, redirect to the protected page
+  // if the user is not logged in, redirect to the login page
+  const session = await unstable_getServerSession(req, res, authOptions);
+  console.log(session);
+  if (session) {
+    if (session.role === 'student') {
+      return {
+        redirect: {
+          destination: '/protected',
+          permanent: false,
+        },
+      };
+    }
+    if (session.role === 'teacher') {
+      return {
+        redirect: {
+          destination: '/protected',
+          permanent: false,
+        },
+      };
+    }
+    if (session.role === 'admin') {
+      return {
+        redirect: {
+          destination: '/protected',
+          permanent: false,
+        },
+      };
+    }
+  } else {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
+  return {
+    props: {},
+  };
+};

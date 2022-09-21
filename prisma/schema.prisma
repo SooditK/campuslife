@@ -50,6 +50,7 @@ model Teacher {
     email        String      @unique
     isVerified   Boolean     @default(false)
     password     String
+    phone        String
     Department   Department? @relation(fields: [departmentId], references: [id])
     subjects     Subject[]
     departmentId String?
@@ -119,8 +120,15 @@ model Class {
 model Student {
     id                String       @id @default(cuid())
     name              String
+    isVerified        Boolean      @default(false)
+    fatherName        String
+    motherName        String
+    enrollmentNumber  String       @unique
+    phone             String
     email             String       @unique
     password          String
+    course            String
+    year              String
     assignments       Assignment[]
     classes           Class[]
     appliedPlacements Placement[]

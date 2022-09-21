@@ -1,38 +1,54 @@
-import { signIn } from 'next-auth/react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { BiLock } from 'react-icons/bi';
-import { useRouter } from 'next/router';
 import {
-  isValidEmail,
   validatePassword,
+  isValidEmail,
 } from '../../../utils/validatePassword';
+import { trpc } from '../../utils/trpc';
+import { useRouter } from 'next/router';
 
-export default function LoginComponent() {
+const Teacher = () => {
   const router = useRouter();
   const [data, setData] = useState({
     email: '',
     password: '',
+    name: '',
+    phoneNumber: '',
   });
-  async function handleSignin(e: React.SyntheticEvent) {
+  const mutate = trpc.useMutation(['auth.registerfaculty']);
+  async function handleMutate(e: React.SyntheticEvent) {
     e.preventDefault();
-    if (!isValidEmail(data.email) || !validatePassword(data.password)) {
-      toast.error('Invalid email or password');
+    if (!validatePassword(data.password) || !isValidEmail(data.email)) {
+      toast.error('Invalid Password or Email');
+      return;
     } else {
-      toast.loading('Signing in...');
-      const res = await signIn('credentials', {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      });
-      toast.dismiss();
-      if (res?.error) {
-        toast.error(res.error);
+      if (!data.phoneNumber || !data.name || !data.email || !data.password) {
+        toast.error('Please fill all the fields');
+        return;
       }
-      if (res?.ok) {
-        toast.success('Signed in successfully');
-        router.push('/protected');
-      }
+      toast.loading('Registering...');
+      mutate.mutate(
+        {
+          email: data.email,
+          password: data.password,
+          name: data.name,
+          phone: data.phoneNumber,
+        },
+        {
+          onSuccess: () => {
+            toast.dismiss();
+            toast.success('Registered Successfully');
+            setTimeout(() => {
+              router.push('/login');
+            }, 500);
+          },
+          onError(error, variables, context) {
+            toast.dismiss();
+            toast.error(error.message);
+          },
+        }
+      );
     }
   }
   return (
@@ -60,8 +76,8 @@ export default function LoginComponent() {
           </div>
           <form className="mt-8 space-y-6" action="#" method="POST">
             <input type="hidden" name="remember" defaultValue="true" />
-            <div className="-space-y-px rounded-md shadow-sm">
-              <div className="mb-4">
+            <div className="rounded-md shadow-sm">
+              <div className="mb-2">
                 <label htmlFor="email-address" className="sr-only">
                   Email address
                 </label>
@@ -71,13 +87,28 @@ export default function LoginComponent() {
                   type="email"
                   value={data.email}
                   onChange={(e) => setData({ ...data, email: e.target.value })}
-                  autoComplete="email"
                   required
                   className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                   placeholder="Email address"
                 />
               </div>
-              <div>
+              <div className="mb-2">
+                <label htmlFor="name" className="sr-only">
+                  Name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  value={data.name}
+                  onChange={(e) => setData({ ...data, name: e.target.value })}
+                  autoComplete="name"
+                  required
+                  className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  placeholder="Name"
+                />
+              </div>
+              <div className="mb-2">
                 <label htmlFor="password" className="sr-only">
                   Password
                 </label>
@@ -89,44 +120,34 @@ export default function LoginComponent() {
                   onChange={(e) =>
                     setData({ ...data, password: e.target.value })
                   }
-                  autoComplete="current-password"
                   required
                   className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                   placeholder="Password"
                 />
               </div>
-            </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-                <label
-                  htmlFor="remember-me"
-                  className="ml-2 block text-sm text-gray-900"
-                >
-                  Remember me
+              <div className="mb-2">
+                <label htmlFor="phone" className="sr-only">
+                  Phone Number
                 </label>
-              </div>
-
-              <div className="text-sm">
-                <a
-                  href="#"
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
-                >
-                  Forgot your password?
-                </a>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="text"
+                  value={data.phoneNumber}
+                  onChange={(e) =>
+                    setData({ ...data, phoneNumber: e.target.value })
+                  }
+                  required
+                  className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  placeholder="Phone Number"
+                />
               </div>
             </div>
-
             <div>
               <button
                 type="submit"
-                onClick={handleSignin}
+                onClick={handleMutate}
                 className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
@@ -135,7 +156,7 @@ export default function LoginComponent() {
                     aria-hidden="true"
                   />
                 </span>
-                Sign in
+                Sign Up
               </button>
             </div>
           </form>
@@ -143,4 +164,6 @@ export default function LoginComponent() {
       </div>
     </>
   );
-}
+};
+
+export default Teacher;

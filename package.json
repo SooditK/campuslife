@@ -25,6 +25,7 @@
     "@trpc/react": "^9.27.2",
     "@trpc/server": "^9.27.2",
     "bcrypt": "^5.0.1",
+    "date-fns": "^2.29.3",
     "fast-jwt": "^1.7.1",
     "next": "12.2.5",
     "next-auth": "^4.10.3",
