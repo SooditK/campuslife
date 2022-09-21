@@ -31,7 +31,7 @@ export default function LoginComponent() {
       }
       if (res?.ok) {
         toast.success('Signed in successfully');
-        router.push('/protected');
+        router.push('/');
       }
     }
   }

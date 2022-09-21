@@ -13,10 +13,6 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
   },
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
-    }),
     CredentialsProvider({
       type: 'credentials',
       credentials: {},
@@ -37,12 +33,10 @@ export const authOptions: NextAuthOptions = {
             if (!student) {
               throw new Error('No user found');
             }
-            // match password
             const match = await bcrypt.compare(password, student.password);
             if (!match) {
               throw new Error('Incorrect Email or password');
             } else {
-              // check if student is verified
               if (!student.isVerified) {
                 throw new Error('Please verify your account');
               } else {
@@ -79,13 +73,24 @@ export const authOptions: NextAuthOptions = {
           id: finaluser?.id,
           email: finaluser?.email,
           name: finaluser?.name,
-          role,
+          role: role,
         };
       },
     }),
   ],
   pages: {
     signIn: '/login',
+  },
+  callbacks: {
+    async jwt({ token, user, account }) {
+      if (user) {
+        token = {
+          ...token,
+          ...user,
+        };
+      }
+      return token;
+    },
   },
   secret: env.NEXTAUTH_SECRET,
 };

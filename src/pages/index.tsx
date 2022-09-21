@@ -1,8 +1,7 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { GetServerSideProps } from 'next';
-import { unstable_getServerSession } from 'next-auth/next';
-import { authOptions } from './api/auth/[...nextauth]';
+import { getToken } from 'next-auth/jwt';
 
 const Home: NextPage = () => {
   return (
@@ -26,36 +25,9 @@ export default Home;
 
 // getserversideprops
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  // if the user is already logged in, redirect to the protected page
-  // if the user is not logged in, redirect to the login page
-  const session = await unstable_getServerSession(req, res, authOptions);
-  console.log(session);
-  if (session) {
-    if (session.role === 'student') {
-      return {
-        redirect: {
-          destination: '/protected',
-          permanent: false,
-        },
-      };
-    }
-    if (session.role === 'teacher') {
-      return {
-        redirect: {
-          destination: '/protected',
-          permanent: false,
-        },
-      };
-    }
-    if (session.role === 'admin') {
-      return {
-        redirect: {
-          destination: '/protected',
-          permanent: false,
-        },
-      };
-    }
-  } else {
+  const token = await getToken({ req, secret: process.env.SECRET });
+  console.log(token);
+  if (!token) {
     return {
       redirect: {
         destination: '/login',
@@ -63,6 +35,30 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       },
     };
   }
+
+  if (token.role === 'admin') {
+    return {
+      redirect: {
+        destination: '/admin',
+        permanent: false,
+      },
+    };
+  } else if (token.role === 'student') {
+    return {
+      redirect: {
+        destination: '/student',
+        permanent: false,
+      },
+    };
+  } else if (token.role === 'teacher') {
+    return {
+      redirect: {
+        destination: '/teacher',
+        permanent: false,
+      },
+    };
+  }
+
   return {
     props: {},
   };
