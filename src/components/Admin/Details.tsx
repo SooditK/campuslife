@@ -7,7 +7,7 @@ import { MdAlternateEmail } from 'react-icons/md';
 import { RiPhoneLine, RiParentLine } from 'react-icons/ri';
 import { BiTrashAlt } from 'react-icons/bi';
 import { AiOutlineNumber } from 'react-icons/ai';
-import { FaChalkboardTeacher } from 'react-icons/fa';
+import { FaChalkboardTeacher, FaUser, FaUserEdit } from 'react-icons/fa';
 import { BsCalendar3 } from 'react-icons/bs';
 import { trpc } from '../../utils/trpc';
 import toast from 'react-hot-toast';
@@ -27,6 +27,7 @@ interface IDetailsProps {
   course?: string;
   enrollmentNumber?: string;
   motherName?: string;
+  handleEdit?: boolean;
 }
 
 export default function Details({
@@ -40,11 +41,13 @@ export default function Details({
   course,
   motherName,
   enrollmentNumber,
+  handleEdit,
 }: IDetailsProps) {
   const deleteTeacherMutation = trpc.useMutation(['admin.delete-teacher']);
   const verifyTeacherMutation = trpc.useMutation(['admin.verify-teacher']);
   const deleteStudentMutation = trpc.useMutation(['admin.delete-student']);
   const verifyStudentMutation = trpc.useMutation(['admin.verify-student']);
+  const updateStudentMutation = trpc.useMutation(['admin.update-student']);
   const utils = trpc.useContext();
 
   async function handleDelete(e: React.SyntheticEvent, id: string) {
@@ -121,6 +124,11 @@ export default function Details({
         },
       }
     );
+  }
+
+  async function handleUpdateStudent(e: React.SyntheticEvent, id: string) {
+    e.preventDefault();
+    console.log('update', id);
   }
 
   return (
@@ -228,13 +236,21 @@ export default function Details({
               if (!enrollmentNumber) {
                 handleVerify(e, id);
               } else {
-                handleVerifyStudent(e, id);
+                if (handleEdit === false) {
+                  handleVerifyStudent(e, id);
+                } else {
+                  handleUpdateStudent(e, id);
+                }
               }
             }}
             className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           >
-            <BsCheck className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-            Verify
+            {handleEdit ? (
+              <FaUserEdit className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+            ) : (
+              <BsCheck className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+            )}
+            {handleEdit ? 'Edit' : 'Verify'}
           </button>
         </span>
 
