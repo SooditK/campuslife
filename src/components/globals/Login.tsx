@@ -7,6 +7,7 @@ import {
   isValidEmail,
   validatePassword,
 } from '../../../utils/validatePassword';
+import Link from 'next/link';
 
 export default function LoginComponent() {
   const router = useRouter();
@@ -50,12 +51,11 @@ export default function LoginComponent() {
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
               Or{' '}
-              <a
-                onClick={() => router.push('/signup/student')}
-                className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
-              >
-                start your 14-day free trial
-              </a>
+              <Link href="/signup/student">
+                <span className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer">
+                  Create a new Account
+                </span>
+              </Link>
             </p>
           </div>
           <form className="mt-8 space-y-6" action="#" method="POST">

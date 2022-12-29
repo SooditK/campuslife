@@ -43,7 +43,9 @@ export default withTRPC<AppRouter>({
       url,
       transformer: superjson,
 
-      queryClientConfig: { defaultOptions: { queries: { staleTime: 60 } } },
+      queryClientConfig: {
+        defaultOptions: { queries: { staleTime: 60 } },
+      },
 
       headers: () => {
         if (ctx?.req) {

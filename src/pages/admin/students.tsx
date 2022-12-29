@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Details from '../../components/Admin/Details';
 import Tabbar from '../../components/globals/Tabbar';
 import { trpc } from '../../utils/trpc';
+import Header from '../../components/globals/Header';
 
 const Tabs = [
   { name: 'BTECH', href: '#', current: true },
@@ -57,6 +58,7 @@ export default function Students() {
   }
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <Header />
       <div className="lg:text-center my-8">
         <h2 className="text-lg font-semibold text-indigo-600">Welcome</h2>
         <p className="mt-2 text-3xl font-bold leading-8 tracking-tight text-gray-900 sm:text-4xl">

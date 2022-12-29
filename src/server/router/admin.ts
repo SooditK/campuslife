@@ -60,6 +60,28 @@ export const adminRouter = createRouter()
       }
     },
   })
+  .query('getstudentbyid', {
+    input: z.object({
+      id: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      const isAdmin = await ctx.prisma.admin.findUnique({
+        where: {
+          email: String(ctx!.session!.user!.email),
+        },
+      });
+      if (!isAdmin) {
+        throw new Error('Not Authorized');
+      } else {
+        const student = await ctx.prisma.student.findUnique({
+          where: {
+            id: input.id,
+          },
+        });
+        return student;
+      }
+    },
+  })
   .mutation('verify-teacher', {
     input: z.object({
       id: z.string(),
@@ -233,18 +255,6 @@ export const adminRouter = createRouter()
             isVerified: true,
             year: input.year,
             course: input.course,
-          },
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            createdAt: true,
-            fatherName: true,
-            year: true,
-            course: true,
-            enrollmentNumber: true,
-            motherName: true,
           },
         });
         return students;

@@ -1,5 +1,6 @@
 import Details from './Details';
 import { trpc } from '../../utils/trpc';
+import Header from '../globals/Header';
 
 export default function VerifyStudent() {
   const nonverifiedstudents = trpc.useQuery(['admin.getnon-verified-students']);
@@ -12,6 +13,7 @@ export default function VerifyStudent() {
   return (
     <div className="bg-white py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <Header />
         <div className="lg:text-center">
           <h2 className="text-lg font-semibold text-indigo-600">Welcome</h2>
           <p className="mt-2 text-3xl font-bold leading-8 tracking-tight text-gray-900 sm:text-4xl">
@@ -22,7 +24,6 @@ export default function VerifyStudent() {
             voluptatum cupiditate veritatis in accusamus quisquam.
           </p>
         </div>
-
         <div className="mt-10">
           <div className="md:grid md:grid-cols-1 md:gap-x-8 md:gap-y-10 md:space-y-0">
             {nonverifiedstudents.data!.length > 0 &&
@@ -42,6 +43,7 @@ export default function VerifyStudent() {
                     course={feature.course}
                     motherName={feature.motherName}
                     enrollmentNumber={feature.enrollmentNumber}
+                    handleEdit={false}
                   />
                 </div>
               ))}

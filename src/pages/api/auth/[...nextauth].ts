@@ -25,7 +25,7 @@ export const authOptions: NextAuthOptions = {
         let role;
         const adminuser = await prisma.admin.findUnique({ where: { email } });
         if (!adminuser) {
-          const teacher = await prisma.teacher.findUnique({ where: { email } });
+          const teacher = await prisma.teacher.findFirst({ where: { email } });
           if (!teacher) {
             const student = await prisma.student.findUnique({
               where: { email },
@@ -46,6 +46,7 @@ export const authOptions: NextAuthOptions = {
             }
           } else {
             // match password
+            console.log('we found teacher', teacher);
             const match = await bcrypt.compare(password, teacher.password);
             if (!match) {
               throw new Error('Incorrect Email or password');
