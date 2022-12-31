@@ -377,4 +377,152 @@ export const adminRouter = createRouter()
         return departments;
       }
     },
+  })
+  .mutation('assign-teachers-to-department', {
+    input: z.object({
+      departmentId: z.string(),
+      teacherIds: z.array(z.string()),
+    }),
+    async resolve({ ctx, input }) {
+      const isAdmin = await ctx.prisma.admin.findUnique({
+        where: {
+          email: String(ctx!.session!.user!.email),
+        },
+      });
+      if (!isAdmin) {
+        throw new Error('Not Authorized');
+      } else {
+        const department = await ctx.prisma.department.update({
+          where: {
+            id: input.departmentId,
+          },
+          data: {
+            teachers: {
+              connect: input.teacherIds.map((id) => ({
+                id,
+              })),
+            },
+          },
+        });
+        return {
+          success: true,
+          message: 'Teachers assigned to department successfully',
+          id: department.id,
+          name: department.name,
+        };
+      }
+    },
+  })
+  .query('get-all-teachers-by-department', {
+    input: z.object({
+      departmentId: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      const isAdmin = await ctx.prisma.admin.findUnique({
+        where: {
+          email: String(ctx!.session!.user!.email),
+        },
+      });
+      if (!isAdmin) {
+        throw new Error('Not Authorized');
+      } else {
+        const teachers = await ctx.prisma.teacher.findMany({
+          where: {
+            departmentId: input.departmentId,
+          },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            createdAt: true,
+          },
+        });
+        return teachers;
+      }
+    },
+  })
+  .query('get-all-non-assigned-teachers', {
+    async resolve({ ctx }) {
+      const isAdmin = await ctx.prisma.admin.findUnique({
+        where: {
+          email: String(ctx!.session!.user!.email),
+        },
+      });
+      if (!isAdmin) {
+        throw new Error('Not Authorized');
+      } else {
+        const teachers = await ctx.prisma.teacher.findMany({
+          where: {
+            departmentId: null,
+          },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            createdAt: true,
+          },
+        });
+        return teachers;
+      }
+    },
+  })
+  .mutation('delete-department', {
+    input: z.object({
+      id: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      const isAdmin = await ctx.prisma.admin.findUnique({
+        where: {
+          email: String(ctx!.session!.user!.email),
+        },
+      });
+      if (!isAdmin) {
+        throw new Error('Not Authorized');
+      } else {
+        const department = await ctx.prisma.department.delete({
+          where: {
+            id: input.id,
+          },
+        });
+        return {
+          id: department.id,
+          name: department.name,
+        };
+      }
+    },
+  })
+  .mutation('remove-teacher-from-department', {
+    input: z.object({
+      departmentId: z.string(),
+      teacherId: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      const isAdmin = await ctx.prisma.admin.findUnique({
+        where: {
+          email: String(ctx!.session!.user!.email),
+        },
+      });
+      if (!isAdmin) {
+        throw new Error('Not Authorized');
+      } else {
+        const department = await ctx.prisma.department.update({
+          where: {
+            id: input.departmentId,
+          },
+          data: {
+            teachers: {
+              disconnect: {
+                id: input.teacherId,
+              },
+            },
+          },
+        });
+        return {
+          id: department.id,
+          name: department.name,
+        };
+      }
+    },
   });
