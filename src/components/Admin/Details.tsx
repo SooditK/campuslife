@@ -246,7 +246,6 @@ export default function Details({
                 if (!enrollmentNumber) {
                   handleVerify(e, id);
                 } else {
-                  console.log('handleEdit', handleEdit);
                   if (handleEdit === false) {
                     handleVerifyStudent(e, id);
                   } else {

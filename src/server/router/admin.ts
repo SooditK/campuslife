@@ -317,4 +317,64 @@ export const adminRouter = createRouter()
         };
       }
     },
+  })
+  .mutation('create-department', {
+    input: z.object({
+      name: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      const isAdmin = await ctx.prisma.admin.findUnique({
+        where: {
+          email: String(ctx!.session!.user!.email),
+        },
+      });
+      if (!isAdmin) {
+        throw new Error('Not Authorized');
+      } else {
+        const isDepartmentThere = await ctx.prisma.department.findUnique({
+          where: {
+            name: input.name,
+          },
+        });
+        if (isDepartmentThere) {
+          return {
+            success: false,
+            message: 'Department already exists',
+          };
+        } else {
+          // create a new department
+          const department = await ctx.prisma.department.create({
+            data: {
+              name: input.name,
+            },
+          });
+          return {
+            success: true,
+            message: 'Department created successfully',
+            id: department.id,
+            name: department.name,
+          };
+        }
+      }
+    },
+  })
+  .query('get-all-departments', {
+    async resolve({ ctx }) {
+      const isAdmin = await ctx.prisma.admin.findUnique({
+        where: {
+          email: String(ctx!.session!.user!.email),
+        },
+      });
+      if (!isAdmin) {
+        throw new Error('Not Authorized');
+      } else {
+        const departments = await ctx.prisma.department.findMany({
+          select: {
+            id: true,
+            name: true,
+          },
+        });
+        return departments;
+      }
+    },
   });
