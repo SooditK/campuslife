@@ -7,11 +7,10 @@ import { MdAlternateEmail } from 'react-icons/md';
 import { RiPhoneLine, RiParentLine } from 'react-icons/ri';
 import { BiTrashAlt } from 'react-icons/bi';
 import { AiOutlineNumber } from 'react-icons/ai';
-import { FaChalkboardTeacher, FaUser, FaUserEdit } from 'react-icons/fa';
+import { FaChalkboardTeacher, FaUserEdit } from 'react-icons/fa';
 import { BsCalendar3 } from 'react-icons/bs';
 import { trpc } from '../../utils/trpc';
 import toast from 'react-hot-toast';
-import { BsThreeDotsVertical } from 'react-icons/bs';
 import EditModal from '../globals/EditModal';
 
 function classNames(...classes: string[]) {
@@ -30,6 +29,7 @@ interface IDetailsProps {
   enrollmentNumber?: string;
   motherName?: string;
   handleEdit?: boolean;
+  disabled?: boolean;
 }
 
 export default function Details({
@@ -44,12 +44,12 @@ export default function Details({
   motherName,
   enrollmentNumber,
   handleEdit,
+  disabled,
 }: IDetailsProps) {
   const deleteTeacherMutation = trpc.useMutation(['admin.delete-teacher']);
   const verifyTeacherMutation = trpc.useMutation(['admin.verify-teacher']);
   const deleteStudentMutation = trpc.useMutation(['admin.delete-student']);
   const verifyStudentMutation = trpc.useMutation(['admin.verify-student']);
-  const updateStudentMutation = trpc.useMutation(['admin.update-student']);
   const [showEditModal, setShowEditModal] = useState(false);
   const [studentID, setStudentID] = useState('');
   const utils = trpc.useContext();
@@ -255,7 +255,10 @@ export default function Details({
                   }
                 }
               }}
-              className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              disabled={disabled ? true : false}
+              className={`inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                disabled ? 'cursor-not-allowed' : ''
+              }`}
             >
               {handleEdit ? (
                 <FaUserEdit className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />

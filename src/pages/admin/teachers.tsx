@@ -17,14 +17,15 @@ function VerifiedTeachers() {
       <div className="lg:text-center my-8">
         <h2 className="text-lg font-semibold text-indigo-600">Welcome</h2>
         <p className="mt-2 text-3xl font-bold leading-8 tracking-tight text-gray-900 sm:text-4xl">
-          CAMPUSLIFE
+          OPEN SOURCE SELF HOSTABLE COLLEGE MANAGEMENT SYSTEM
         </p>
         <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-          Lorem ipsum dolor sit amet consect adipisicing elit. Possimus magnam
-          voluptatum cupiditate veritatis in accusamus quisquam.
+          Welcome to the College Management System! We are excited to provide
+          you with this platform to streamline and automate various processes
+          related to college management.
         </p>
       </div>
-      <pre>{JSON.stringify(allVerifiedTeachers.data, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(allVerifiedTeachers.data, null, 2)}</pre> */}
       <div className="md:grid md:grid-cols-1 md:gap-x-8 md:gap-y-10 md:space-y-0">
         {allVerifiedTeachers.data?.map((teacher) => (
           <div
@@ -38,6 +39,7 @@ function VerifiedTeachers() {
               name={teacher.name}
               phone={teacher.phone}
               handleEdit={true}
+              disabled={true}
             />
           </div>
         ))}

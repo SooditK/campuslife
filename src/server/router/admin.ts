@@ -520,6 +520,8 @@ export const adminRouter = createRouter()
           },
         });
         return {
+          success: true,
+          message: 'Teacher removed from department successfully',
           id: department.id,
           name: department.name,
         };

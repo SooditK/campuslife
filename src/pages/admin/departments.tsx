@@ -3,7 +3,7 @@ import Header from '../../components/globals/Header';
 import { trpc } from '../../utils/trpc';
 import { toast } from 'react-hot-toast';
 import { RiDeleteBin6Line, RiEdit2Line } from 'react-icons/ri';
-import { BiShow } from 'react-icons/bi';
+import { BiShow, BiTrash } from 'react-icons/bi';
 import Select from 'react-select';
 
 const Departments = () => {
@@ -22,6 +22,9 @@ const Departments = () => {
   ]);
   const utils = trpc.useContext();
   const allDepartments = trpc.useQuery(['admin.get-all-departments']);
+  const deleteTeacherFromDepartment = trpc.useMutation([
+    'admin.remove-teacher-from-department',
+  ]);
   const allTeachersforSelectedDepartment = trpc.useQuery([
     'admin.get-all-teachers-by-department',
     {
@@ -33,6 +36,34 @@ const Departments = () => {
     value: teacher.id,
     label: teacher.name,
   }));
+
+  async function deleteTeacherFromDepartmentHandler(
+    e: SyntheticEvent,
+    teacherId: string
+  ) {
+    e.preventDefault();
+    toast.loading('Deleting teacher from department...');
+    deleteTeacherFromDepartment.mutate(
+      {
+        departmentId,
+        teacherId,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.success) {
+            toast.dismiss();
+            toast.success(data.message);
+            utils.invalidateQueries(['admin.get-all-departments']);
+            utils.invalidateQueries(['admin.get-all-teachers-by-department']);
+          }
+        },
+        onError: (error) => {
+          toast.dismiss();
+          toast.error(error.message);
+        },
+      }
+    );
+  }
 
   async function createDepartment(e: SyntheticEvent) {
     e.preventDefault();
@@ -189,7 +220,7 @@ const Departments = () => {
             >
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                     <h3
                       className="text-lg leading-6 font-medium text-gray-900"
                       id="modal-title"
@@ -200,7 +231,25 @@ const Departments = () => {
                       <ul>
                         {allTeachersforSelectedDepartment.data?.map(
                           (teacher) => (
-                            <li key={teacher.id}>{teacher.name}</li>
+                            <div
+                              className="flex items-center justify-between border-b border-gray-300 py-2 hover:cursor-pointer"
+                              key={teacher.id}
+                            >
+                              <div className="flex items-center justify-between">
+                                <li>{teacher.name}</li>
+                              </div>
+                              <span
+                                className="bg-red-100 p-2 rounded-xl hover:bg-red-200"
+                                onClick={(e) =>
+                                  deleteTeacherFromDepartmentHandler(
+                                    e,
+                                    teacher.id
+                                  )
+                                }
+                              >
+                                <BiTrash className="text-red-500" />
+                              </span>
+                            </div>
                           )
                         )}
                       </ul>
@@ -298,11 +347,12 @@ const Departments = () => {
         <div className="lg:text-center my-8">
           <h2 className="text-lg font-semibold text-indigo-600">Welcome</h2>
           <p className="mt-2 text-3xl font-bold leading-8 tracking-tight text-gray-900 sm:text-4xl">
-            CAMPUSLIFE
+            OPEN SOURCE SELF HOSTABLE COLLEGE MANAGEMENT SYSTEM
           </p>
           <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-            Lorem ipsum dolor sit amet consect adipisicing elit. Possimus magnam
-            voluptatum cupiditate veritatis in accusamus quisquam.
+            Welcome to the College Management System! We are excited to provide
+            you with this platform to streamline and automate various processes
+            related to college management.
           </p>
         </div>
         <div className="mx-auto flex justify-center items-center">
